@@ -30,6 +30,18 @@ module TestBench
         def limit?
           !limit.nil?
         end
+
+        def flush(device=nil, alternate_device=nil)
+          if not device.nil?
+            device.write(contents)
+          end
+
+          if not alternate_device.nil?
+            alternate_device.write(contents)
+          end
+
+          contents.clear
+        end
       end
     end
   end
