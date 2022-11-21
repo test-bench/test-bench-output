@@ -30,6 +30,14 @@ module TestBench
         def limit?
           !limit.nil?
         end
+
+        def flush(*devices)
+          devices.each do |device|
+            device.write(contents)
+          end
+
+          contents.clear
+        end
       end
     end
   end
