@@ -36,6 +36,14 @@ module TestBench
               written_data == data
             end
           end
+
+          def flushed?(data=nil)
+            if data.nil?
+              !flushed_data.empty?
+            else
+              flushed_data == data
+            end
+          end
         end
       end
     end
