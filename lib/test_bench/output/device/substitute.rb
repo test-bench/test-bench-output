@@ -19,6 +19,14 @@ module TestBench
 
             bytes_written
           end
+
+          def written?(data=nil)
+            if data.nil?
+              !written_data.empty?
+            else
+              written_data == data
+            end
+          end
         end
       end
     end
