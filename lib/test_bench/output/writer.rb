@@ -6,6 +6,11 @@ module TestBench
       end
       attr_writer :device
 
+      def buffer
+        @buffer ||= Buffer.new
+      end
+      attr_writer :buffer
+
       def tty
         @tty.nil? ? @tty = device_tty? : @tty
       end
@@ -14,6 +19,10 @@ module TestBench
 
       def device_tty?
         device.tty?
+      end
+
+      def flush
+        buffer.flush(device)
       end
     end
   end
