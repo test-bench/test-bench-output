@@ -21,6 +21,11 @@ module TestBench
       end
       attr_writer :sequence
 
+      def column_sequence
+        @column_sequence ||= 0
+      end
+      attr_writer :column_sequence
+
       def buffer
         @buffer ||= Buffer.new
       end
@@ -28,6 +33,16 @@ module TestBench
 
       def sync
         @sync.nil? ? @sync = true : @sync
+      end
+
+      def print(text)
+        text = text.dump[1...-1]
+
+        self.column_sequence += text.length
+
+        write(text)
+
+        self
       end
 
       def write(data)
