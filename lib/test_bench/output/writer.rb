@@ -6,6 +6,12 @@ module TestBench
       end
       attr_writer :device
 
+      def styling_policy
+        @styling_policy ||= Styling.default
+      end
+      alias :styling :styling_policy
+      attr_writer :styling_policy
+
       def digest
         @digest ||= Digest.new
       end
@@ -91,6 +97,49 @@ module TestBench
 
       def current?(sequence)
         sequence >= self.sequence
+      end
+
+      def styling?
+        Styling.styling?(styling_policy, tty?)
+      end
+
+      module Styling
+        Error = Class.new(RuntimeError)
+
+        def self.styling?(policy, console)
+          assure_styling(policy, console)
+        end
+
+        def self.assure_styling(policy, console=nil)
+          console ||= false
+
+          case policy
+          when on
+            true
+          when off
+            false
+          when detect
+            console ? true : false
+          else
+            raise Error, "Unknown styling policy #{policy.inspect}"
+          end
+        end
+
+        def self.on = :on
+        def self.off = :off
+        def self.detect = :detect
+
+        def self.default
+          policy = ENV.fetch('TEST_BENCH_OUTPUT_STYLING') do
+            return default!
+          end
+
+          policy.to_sym
+        end
+
+        def self.default!
+          :detect
+        end
       end
     end
   end
