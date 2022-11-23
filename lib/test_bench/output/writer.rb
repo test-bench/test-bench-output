@@ -16,6 +16,11 @@ module TestBench
       end
       attr_writer :sequence
 
+      def column_sequence
+        @column_sequence ||= 0
+      end
+      attr_writer :column_sequence
+
       def buffer
         @buffer ||= Buffer.new
       end
@@ -30,6 +35,14 @@ module TestBench
       end
       attr_writer :tty
       alias :tty? :tty
+
+      def print(text)
+        self.column_sequence += text.length
+
+        write(text)
+
+        self
+      end
 
       def write(data)
         if sync
