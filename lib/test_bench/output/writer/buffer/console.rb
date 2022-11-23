@@ -17,6 +17,10 @@ module TestBench
             geometry.capacity
           end
 
+          def next_position(text)
+            geometry.next_position(text)
+          end
+
           Geometry = Struct.new(:width, :height, :row, :column) do
             def capacity
               capacity = 0
@@ -31,6 +35,51 @@ module TestBench
               end
 
               capacity
+            end
+
+            def next_position(text)
+              text_length = text.length
+
+              newline = text.end_with?("\n")
+              if newline
+                text_length -= 1
+              end
+
+              row = self.row
+              column = self.column
+
+              text_rows, text_columns = text_length.divmod(width)
+
+              row += text_rows
+
+              columns_remaining = width - column
+              if columns_remaining > text_columns
+                column += text_columns
+              else
+                row += 1
+                column = text_columns - columns_remaining
+              end
+
+              if newline
+                reached_next_line = column == 0 && row > self.row
+
+                newline_needed = !reached_next_line
+                if newline_needed
+                  row += 1
+                  column = 0
+                end
+              end
+
+              if row >= height
+                row_limit = height - 1
+
+                scroll_rows = row - row_limit
+                row = row_limit
+              else
+                scroll_rows = 0
+              end
+
+              return row, column, scroll_rows
             end
           end
         end
