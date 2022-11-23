@@ -26,6 +26,11 @@ module TestBench
       end
       attr_writer :column_sequence
 
+      def indentation_depth
+        @indentation_depth ||= 0
+      end
+      attr_writer :indentation_depth
+
       def buffer
         @buffer ||= Buffer.new
       end
@@ -33,6 +38,12 @@ module TestBench
 
       def sync
         @sync.nil? ? @sync = true : @sync
+      end
+
+      def indent
+        indentation = '  ' * indentation_depth
+
+        print(indentation)
       end
 
       def print(text)
@@ -90,6 +101,16 @@ module TestBench
       def current?(sequence)
         sequence >= self.sequence
       end
+
+      def increase_indentation
+        self.indentation_depth += 1
+      end
+      alias :indent! :increase_indentation
+
+      def decrease_indentation
+        self.indentation_depth -= 1
+      end
+      alias :deindent! :decrease_indentation
     end
   end
 end
