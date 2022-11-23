@@ -13,6 +13,12 @@ module TestBench
           end
           attr_writer :geometry
 
+          def cursor_saved
+            @cursor_saved ||= false
+          end
+          alias :cursor_saved? :cursor_saved
+          attr_writer :cursor_saved
+
           def self.build(device=nil)
             device ||= Defaults.device
 
@@ -37,6 +43,35 @@ module TestBench
             self.geometry = geometry
           end
 
+          def receive(text)
+            if not cursor_saved?
+              device.write("\e[s")
+              self.cursor_saved = true
+            end
+
+            write_ahead_text = geometry.next(text)
+
+            if not write_ahead_text.empty?
+              device.write(write_ahead_text)
+            elsif geometry.bottom_row?
+              buffering_message = "Output is buffering"
+
+              device.write("\e[2m#{buffering_message}\e[22m")
+              geometry.next!(buffering_message)
+            end
+
+            device.flush
+
+            write_ahead_text.length
+          end
+
+          def flush(...)
+            if cursor_saved?
+              device.write("\e[u")
+              self.cursor_saved = false
+            end
+          end
+
           def capacity
             geometry.capacity
           end
@@ -56,6 +91,30 @@ module TestBench
               end
 
               instance
+            end
+
+            def bottom_row?
+              row + 1 == height && column == 0
+            end
+
+            def next(text)
+              write_ahead_text = text.slice!(0, capacity)
+
+              next!(write_ahead_text)
+
+              write_ahead_text
+            end
+
+            def next!(text)
+              escape_sequence_pattern = %r{\A\e\[[[:digit:]]+(?:;[[:digit:]]+)*[[:alpha:]]$}
+              if escape_sequence_pattern.match?(text)
+                return
+              end
+
+              row, column, _scroll_rows = next_position(text)
+
+              self.row = row
+              self.column = column
             end
 
             def capacity
