@@ -17,6 +17,9 @@ module TestBench
           end
           attr_writer :flushed_data
 
+          attr_accessor :tty
+          def tty? = !!tty
+
           def write(data)
             bytes_written = data.bytesize
 
@@ -43,6 +46,10 @@ module TestBench
             else
               flushed_data == data
             end
+          end
+
+          def tty!
+            self.tty = true
           end
         end
       end
