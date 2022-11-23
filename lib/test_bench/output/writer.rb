@@ -71,6 +71,10 @@ module TestBench
           digest.digest?(data)
         end
       end
+
+      def current?(sequence)
+        sequence >= self.sequence
+      end
     end
   end
 end
