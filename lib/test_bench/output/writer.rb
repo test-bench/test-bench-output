@@ -67,6 +67,14 @@ module TestBench
           flush
         end
       end
+
+      def written?(data=nil)
+        if data.nil?
+          sequence > 0
+        else
+          digest.digest?(data)
+        end
+      end
     end
   end
 end
