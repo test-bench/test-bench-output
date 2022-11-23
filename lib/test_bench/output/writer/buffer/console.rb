@@ -3,10 +3,34 @@ module TestBench
     class Writer
       class Buffer
         class Console
+          def device
+            @device ||= Device::Null.build
+          end
+          attr_writer :device
+
           def geometry
-            @geometry ||= Geometry.new
+            @geometry ||= Geometry.get
           end
           attr_writer :geometry
+
+          def self.build(device=nil)
+            device ||= Defaults.device
+
+            instance = new
+
+            if device.tty?
+              instance.device = device
+            end
+
+            instance
+          end
+
+          def self.configure(receiver, device: nil, attr_name: nil)
+            attr_name ||= :buffer
+
+            instance = build(device)
+            receiver.public_send(:"#{attr_name}=", instance)
+          end
 
           def set_geometry(width, height, row, column)
             geometry = Geometry.new(width, height, row, column)
@@ -22,6 +46,18 @@ module TestBench
           end
 
           Geometry = Struct.new(:width, :height, :row, :column) do
+            def self.get
+              instance = new
+
+              STDIN.raw do |stdin|
+                instance.height, instance.width = stdin.winsize
+
+                instance.row, instance.column = stdin.cursor
+              end
+
+              instance
+            end
+
             def capacity
               capacity = 0
 
