@@ -42,6 +42,22 @@ module TestBench
       attr_writer :tty
       alias :tty? :tty
 
+      def style(style, *additional_styles)
+        control_code = Style.control_code(style)
+        control_codes = [control_code]
+
+        additional_styles.each do |style|
+          control_code = Style.control_code(style)
+          control_codes << control_code
+        end
+
+        if styling?
+          write("\e[#{control_codes.join(';')}m")
+        end
+
+        self
+      end
+
       def print(text)
         self.column_sequence += text.length
 
