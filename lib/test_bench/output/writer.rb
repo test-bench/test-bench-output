@@ -11,6 +11,12 @@ module TestBench
       end
       attr_writer :alternate_device
 
+      def styling_policy
+        @styling_policy ||= Styling.default
+      end
+      alias :styling :styling_policy
+      attr_writer :styling_policy
+
       def digest
         @digest ||= Digest.new
       end
@@ -21,6 +27,16 @@ module TestBench
       end
       attr_writer :sequence
 
+      def column_sequence
+        @column_sequence ||= 0
+      end
+      attr_writer :column_sequence
+
+      def indentation_depth
+        @indentation_depth ||= 0
+      end
+      attr_writer :indentation_depth
+
       def buffer
         @buffer ||= Buffer.new
       end
@@ -28,6 +44,58 @@ module TestBench
 
       def sync
         @sync.nil? ? @sync = true : @sync
+      end
+
+      def puts(text=nil)
+        if column_sequence.zero?
+          indent
+        end
+
+        if not text.nil?
+          text = text.chomp
+
+          print(text)
+        end
+
+        style(:reset)
+
+        if tty?
+          write("\e[0K")
+        end
+
+        write("\n")
+
+        self.column_sequence = 0
+      end
+
+      def style(style, *additional_styles)
+        styles = [style, *additional_styles]
+
+        control_codes = styles.map do |style|
+          Style.control_code(style)
+        end
+
+        if styling?
+          write("\e[#{control_codes.join(';')}m")
+        end
+
+        self
+      end
+
+      def indent
+        indentation = '  ' * indentation_depth
+
+        print(indentation)
+      end
+
+      def print(text)
+        text = text.dump[1...-1]
+
+        self.column_sequence += text.length
+
+        write(text)
+
+        self
       end
 
       def write(data)
@@ -74,6 +142,53 @@ module TestBench
 
       def current?(sequence)
         sequence >= self.sequence
+      end
+
+      def increase_indentation
+        self.indentation_depth += 1
+      end
+      alias :indent! :increase_indentation
+
+      def decrease_indentation
+        self.indentation_depth -= 1
+      end
+      alias :deindent! :decrease_indentation
+
+      def styling?
+        Styling.styling?(styling_policy, device.tty?)
+      end
+
+      module Styling
+        Error = Class.new(RuntimeError)
+
+        def self.styling?(policy, console)
+          case policy
+          when on
+            true
+          when off
+            false
+          when detect
+            console ? true : false
+          else
+            raise Error, "Unknown styling policy #{policy.inspect}"
+          end
+        end
+
+        def self.on = :on
+        def self.off = :off
+        def self.detect = :detect
+
+        def self.default
+          policy = ENV.fetch('TEST_BENCH_OUTPUT_STYLING') do
+            return default!
+          end
+
+          policy.to_sym
+        end
+
+        def self.default!
+          :detect
+        end
       end
     end
   end
