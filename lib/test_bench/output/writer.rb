@@ -42,6 +42,24 @@ module TestBench
       attr_writer :tty
       alias :tty? :tty
 
+      def puts(text=nil)
+        if not text.nil?
+          text = text.chomp
+
+          print(text)
+        end
+
+        style(:reset)
+
+        if tty?
+          write("\e[0K")
+        end
+
+        write("\n")
+
+        self.column_sequence = 0
+      end
+
       def style(style, *additional_styles)
         control_code = Style.control_code(style)
         control_codes = [control_code]
