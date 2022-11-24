@@ -1,6 +1,8 @@
 module TestBench
   class Output
     class Writer
+      attr_accessor :peer
+
       def device
         @device ||= Device::Substitute.build
       end
@@ -153,6 +155,18 @@ module TestBench
         self.indentation_depth -= 1
       end
       alias :deindent! :decrease_indentation
+
+      def follows?(other_writer)
+        if sequence < other_writer.sequence
+          false
+        elsif device == other_writer
+          true
+        elsif device == other_writer.peer
+          true
+        else
+          false
+        end
+      end
 
       def styling?
         Styling.styling?(styling_policy, device.tty?)
