@@ -70,6 +70,15 @@ module TestBench
         writer
       end
 
+      def branch
+        alternate = self.class.follow(self)
+        primary = self.class.follow(self)
+
+        primary.peer = alternate
+
+        return primary, alternate
+      end
+
       def puts(text=nil)
         if column_sequence.zero?
           indent
