@@ -48,6 +48,28 @@ module TestBench
         @sync.nil? ? @sync = true : @sync
       end
 
+      def self.follow(previous_writer)
+        device = previous_writer
+
+        alternate_device = previous_writer.peer
+        alternate_device ||= Device::Null.build
+
+        previous_digest = previous_writer.digest
+        digest = previous_digest.clone
+
+        writer = new
+        writer.sync = false
+        writer.device = device
+        writer.alternate_device = alternate_device
+        writer.styling_policy = previous_writer.styling_policy
+        writer.digest = digest
+        writer.sequence = previous_writer.sequence
+        writer.column_sequence = previous_writer.column_sequence
+        writer.indentation_depth = previous_writer.indentation_depth
+        writer.digest = previous_writer.digest.clone
+        writer
+      end
+
       def puts(text=nil)
         if column_sequence.zero?
           indent
