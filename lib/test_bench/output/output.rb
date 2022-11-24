@@ -25,6 +25,12 @@ module TestBench
     end
     attr_writer :branch_count
 
+    def detail_policy
+      @detail_policy ||= Detail.default
+    end
+    alias :detail :detail_policy
+    attr_writer :detail_policy
+
     def current_writer
       if initial? || pending?
         pending_writer
@@ -93,11 +99,52 @@ module TestBench
       mode == Mode.failing
     end
 
+    def detail?
+      Detail.detail?(detail_policy, mode)
+    end
+
     module Mode
       def self.initial = :initial
       def self.pending = :pending
       def self.passing = :passing
       def self.failing = :failing
+    end
+
+    module Detail
+      Error = Class.new(RuntimeError)
+
+      def self.detail?(policy, mode)
+        case policy
+        when on
+          true
+        when off
+          false
+        when failure
+          if mode == Mode.failing || mode == Mode.initial
+            true
+          else
+            false
+          end
+        else
+          raise Error, "Unknown detail policy #{policy.inspect}"
+        end
+      end
+
+      def self.on = :on
+      def self.off = :off
+      def self.failure = :failure
+
+      def self.default
+        policy = ENV.fetch('TEST_BENCH_DETAIL') do
+          return default!
+        end
+
+        policy.to_sym
+      end
+
+      def self.default!
+        :failure
+      end
     end
   end
 end
