@@ -38,6 +38,25 @@ module TestBench
     alias :detail :detail_policy
     attr_writer :detail_policy
 
+    def self.build(device: nil, styling: nil, detail: nil)
+      instance = new
+
+      Writer.configure(instance, device:, styling:, attr_name: :pending_writer)
+
+      if not detail.nil?
+        instance.detail_policy = detail
+      end
+
+      instance
+    end
+
+    def self.register(telemetry, **arguments)
+      instance = build(**arguments)
+
+      telemetry.register(instance)
+      instance
+    end
+
     def receive(event_data)
       case event_data.type
       when ContextStarted.event_type, TestStarted.event_type
