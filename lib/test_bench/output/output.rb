@@ -186,6 +186,19 @@ module TestBench
         puts(title)
     end
 
+    handle Failed do |failed|
+      message = failed.message
+
+      if failing?
+        self.failures += 1
+      end
+
+      writer
+        .indent
+        .style(:red)
+        .puts(message)
+    end
+
     def comment(text, quote, heading)
       if not heading.nil?
         writer.style(:bold, :underline).puts(heading)
