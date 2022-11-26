@@ -31,6 +31,14 @@ module TestBench
             Output.example(styling: true)
           end
         end
+
+        module Pending
+          def self.example
+            output = Styling.example
+            output.pending_writer.buffer.limit = nil
+            output
+          end
+        end
       end
     end
   end
