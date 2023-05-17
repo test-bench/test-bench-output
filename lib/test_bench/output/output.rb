@@ -44,5 +44,23 @@ module TestBench
         receiver.public_send(:"#{attr_name}=", instance)
       end
     end
+
+    module Substitute
+      def self.build
+        Output.new
+      end
+
+      class Output < Telemetry::Substitute::Sink
+        def handle(event_or_event_data)
+          if event_or_event_data.is_a?(Telemetry::Event)
+            event_data = Telemetry::Event::Export.(event_or_event_data)
+          else
+            event_data = event_or_event_data
+          end
+
+          receive(event_data)
+        end
+      end
+    end
   end
 end
