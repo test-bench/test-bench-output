@@ -10,3 +10,5 @@ require 'test_bench/output/writer'
 require 'test_bench/output/writer/style'
 require 'test_bench/output/writer/substitute'
 require 'test_bench/output/writer/defaults'
+
+require 'test_bench/output/output'
