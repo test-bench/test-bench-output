@@ -9,6 +9,19 @@ module TestBench
         end
         attr_writer :contents
 
+        def self.build
+          instance = new
+          instance.limit = 0
+          instance
+        end
+
+        def self.configure(receiver, attr_name: nil)
+          attr_name ||= :buffer
+
+          instance = build
+          receiver.public_send(:"#{attr_name}=", instance)
+        end
+
         def receive(data)
           bytes = data.bytesize
 
