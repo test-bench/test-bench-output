@@ -6,6 +6,7 @@ module TestBench
 
         extend Build
         extend RegisterTelemetry
+        extend Configure
       end
     end
 
@@ -14,14 +15,14 @@ module TestBench
     end
     attr_writer :writer
 
-    def configure(device: nil, styling: nil)
-      Writer.configure(self, device:, styling:)
+    def configure(writer: nil, device: nil, styling: nil)
+      Writer.configure(self, writer:, device:, styling:)
     end
 
     module Build
-      def build(device: nil, styling: nil, **arguments)
+      def build(writer: nil, device: nil, styling: nil, **arguments)
         instance = new
-        instance.configure(device:, styling:, **arguments)
+        instance.configure(writer:, device:, styling:, **arguments)
         instance
       end
     end
@@ -33,6 +34,15 @@ module TestBench
         instance
       end
       alias :register :register_telemetry
+    end
+
+    module Configure
+      def configure(receiver, attr_name: nil, **arguments)
+        attr_name ||= :output
+
+        instance = build(**arguments)
+        receiver.public_send(:"#{attr_name}=", instance)
+      end
     end
   end
 end
