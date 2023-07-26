@@ -17,6 +17,19 @@ module TestBench
         instance.digest
       end
 
+      def self.configure(receiver, inert: nil, attr_name: nil)
+        attr_name ||= :digest
+        inert = true if inert.nil?
+
+        if inert
+          instance = Null.new
+        else
+          instance = self.new
+        end
+
+        receiver.public_send(:"#{attr_name}=", instance)
+      end
+
       def clone
         cloned_digest = Digest.new
         cloned_digest.last_digest = last_digest
