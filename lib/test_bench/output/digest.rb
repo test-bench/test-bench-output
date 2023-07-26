@@ -81,6 +81,15 @@ module TestBench
         "0x%016X" % digest_uint64
       end
 
+      class Null
+        def update(_data)
+        end
+
+        def digest?(_data)
+          false
+        end
+      end
+
       module Defaults
         def self.size_bytes
           8
