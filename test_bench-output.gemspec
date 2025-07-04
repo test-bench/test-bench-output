@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |spec|
   spec.name = 'test_bench-output'
-  spec.version = '0.0.0.0'
+  spec.version = '3.0.0.0.pre.1'
 
-  spec.summary = "## Summary goes here"
+  spec.summary = "Test output writer for TestBench"
   spec.description = <<~TEXT.each_line(chomp: true).map(&:strip).join(' ')
-  ## Description goes here
+  #{spec.summary}.
   TEXT
 
   spec.homepage = 'http://test-bench.software'
@@ -27,6 +27,9 @@ Gem::Specification.new do |spec|
   spec.files = Dir.glob('lib/**/*')
 
   spec.platform = Gem::Platform::RUBY
+
+  spec.add_runtime_dependency 'import_constants'
+  spec.add_runtime_dependency 'test_bench-session'
 
   spec.add_development_dependency 'test_bench_bootstrap'
 end

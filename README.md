@@ -1,12 +1,10 @@
 # Test Bench Output
 
-*[Summary goes here]*
-
-*[Description goes here]*
+Test output writer for TestBench.
 
 ## Documentation
 
-*[Link to documentation goes here]*
+See the [TestBench website](http://test-bench.software) for more information, examples, and user guides.
 
 ## License
 
