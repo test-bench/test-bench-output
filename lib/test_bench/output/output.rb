@@ -380,9 +380,9 @@ module TestBench
       result = status.result
 
       case result
-      when Result.aborted
+      when Result.aborted, Result.failed
         writer.style(:red)
-      when Result.passed, Result.failed, Result.incomplete
+      when Result.passed, Result.incomplete
         writer.style(:green)
       end
 

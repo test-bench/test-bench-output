@@ -19,7 +19,7 @@ context "Output" do
         output.resolve(context_started, status)
 
         context "Printed" do
-          control_text = "  \e[32m#{title}\e[m\n"
+          control_text = "  \e[31m#{title}\e[m\n"
 
           comment output.writer.written_text.inspect
           detail "Control Text: #{control_text.inspect}"
